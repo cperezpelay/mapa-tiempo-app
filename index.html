@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es-CL"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' blob:; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' blob: data:; connect-src 'self' https://huggingface.co https://*.huggingface.co https://*.hf.co https://fonts.googleapis.com https://fonts.gstatic.com; manifest-src 'self'; form-action 'none'; base-uri 'self'"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mapa del Tiempo</title>
+<meta name="description" content="Tu vida en una pantalla y un diagnóstico de cómo se gasta el tiempo, personal y de equipo.">
+<meta name="theme-color" content="#0B0F14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mapa">
+<link rel="icon" href="/mapa-tiempo-app/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/mapa-tiempo-app/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <script type="module" crossorigin src="/mapa-tiempo-app/assets/index-GlXdnJ-w.js"></script>
+  <link rel="stylesheet" crossorigin href="/mapa-tiempo-app/assets/index-DbBWl6aV.css">
+<link rel="manifest" href="/mapa-tiempo-app/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/mapa-tiempo-app/registerSW.js"></script></head><body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand">mapa<span>.</span>tiempo</div>
+    <div class="tabs"><button id="tabP" aria-pressed="true">Vida</button><button id="tabS" aria-pressed="false">Semana</button><button id="tabD" aria-pressed="false">Documentado</button><button id="tabE" aria-pressed="false">Empresa</button></div>
+  </div>
+
+  <div id="personal">
+    <details class="cfg panel" style="margin-top:14px">
+      <summary>Tus supuestos · nacimiento, vida, sueño, trabajo, pantalla</summary>
+      <div class="inputs" style="margin-top:12px">
+        <label class="f">Nacimiento<input data-p="nac" id="p_nac" type="date"></label>
+        <label class="f">Esperanza de vida<input data-p="vida" id="p_vida" type="number" min="50" max="110"></label>
+        <label class="f">Sueño h/día<input data-p="sueno" id="p_sueno" type="number" step="0.5"></label>
+        <label class="f">Trabajo h/semana<input data-p="trabajo" id="p_trabajo" type="number"></label>
+        <label class="f">Traslados h/día hábil<input data-p="traslado" id="p_traslado" type="number" step="0.25"></label>
+        <label class="f">Pantalla ocio h/día<input data-p="pantalla" id="p_pantalla" type="number" step="0.25"></label>
+      </div>
+    </details>
+
+    <div class="chips" id="chips"></div>
+
+    <div class="stage">
+      <div class="head"><h1 id="hTitle"></h1><div class="sub" id="hSub"></div></div>
+      <div class="big" id="hBig"><div class="n" id="hN"></div><div class="l" id="hL"></div></div>
+      <div id="gridBox">
+        <div class="gridrow">
+          <span class="eyebrow">Edad · <span id="cap"></span></span>
+          <div class="seg" id="zoom">
+            <button data-v="anios" aria-pressed="false">Años</button>
+            <button data-v="meses" aria-pressed="false">Meses</button>
+            <button data-v="semanas" aria-pressed="true">Semanas</button>
+          </div>
+        </div>
+        <div class="gridwrap" id="gw"><canvas id="cv"></canvas><div class="tip" id="tip" hidden></div></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="panel" id="yearPanel" hidden style="margin-top:10px">
+        <div class="row" style="justify-content:space-between"><h3 id="yearTitle"></h3><button class="btn" id="yearClose">Cerrar</button></div>
+        <div class="year" id="yearGrid"></div>
+        <ul class="ms" id="yearMs"></ul>
+        <div class="thumbs" id="yearThumbs"></div>
+      </div>
+      <div class="body" id="chBody"></div>
+      <div class="nav"><button class="btn" id="prev">← Anterior</button><button class="btn" id="next">Siguiente →</button></div>
+    </div>
+
+    <section>
+      <div class="sechead"><div><div class="eyebrow">Tendencias</div><h2>En qué se va la semana</h2></div><span class="tag" id="trendTag">Ejemplo</span></div>
+      <div class="panel">
+        <div class="chart" id="trendChart"></div>
+        <div class="legend" id="trendLegend"></div>
+        <div class="stats" id="trendInsights" style="margin-top:12px"></div>
+      </div>
+      <div class="panel" style="margin-top:10px">
+        <h3>Registrar semana</h3>
+        <div class="inputs" style="margin-top:10px">
+          <label class="f">Semana del<input id="lgDate" type="date"></label>
+          <label class="f">Pantalla h/día<input id="lgScreen" type="number" step="0.1" placeholder="3,8"></label>
+          <label class="f">Trabajo h<input id="lgWork" type="number" placeholder="52"></label>
+          <label class="f">Familia h<input id="lgFam" type="number" placeholder="20"></label>
+          <label class="f">Aprendizaje h<input id="lgLearn" type="number" step="0.5" placeholder="3"></label>
+        </div>
+        <div class="row" style="margin-top:10px"><button class="btn primary" id="lgAdd">Guardar semana</button><button class="btn" id="lgReset">Volver al ejemplo</button></div>
+        <p class="note" style="margin-top:8px">Pantalla: Ajustes › Tiempo en pantalla del iPhone da el promedio diario. Trabajo y reuniones salen de Outlook.</p>
+      </div>
+    </section>
+  </div>
+
+  <div id="empresa" hidden>
+    <div class="head" style="margin-top:18px"><h1>Dónde se va el tiempo del equipo</h1><div class="sub">Diagnóstico · semana tipo</div></div>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between"><span class="eyebrow">Supuestos</span><span class="tag">Datos de ejemplo</span></div>
+      <p class="note" style="margin:8px 0 12px">Equipo comercial de 6 personas. En producción, Outlook entrega reuniones (internas vs. clientes según dominio de los asistentes) y HubSpot entrega actividades y deals por dueño.</p>
+      <div class="inputs">
+        <label class="f">Costo hora (UF)<input id="eHora" type="number" step="0.1" value="1.2"></label>
+        <label class="f">Semanas hábiles/año<input id="eSem" type="number" value="46"></label>
+        <label class="f">Meta foco h/semana<input id="eFoco" type="number" value="12"></label>
+      </div>
+    </div>
+    <div class="stats" id="eStats" style="margin-top:12px"></div>
+    <div class="panel" style="margin-top:12px"><h3>Semana por persona</h3><div class="chart" id="eChart" style="margin-top:8px"></div><div class="legend" id="eLegend"></div></div>
+    <div class="panel" style="margin-top:12px"><h3>Tiempo vs. pipeline</h3><div class="scroll"><table id="eTable"></table></div></div>
+    <div class="panel" style="margin-top:12px"><h3>Recomendaciones</h3><ol class="recs" id="eRecs"></ol></div>
+    <div class="panel" style="margin-top:12px"><h3>Fuentes</h3>
+      <div class="stats" style="margin-top:10px">
+        <div class="stat"><span class="v" style="font-size:15px">Outlook</span><span class="d">Reuniones, recurrentes, internos vs. externos, bloques de foco ≥2 h.</span></div>
+        <div class="stat"><span class="v" style="font-size:15px">HubSpot</span><span class="d">Deals por etapa y dueño, actividades, días sin contacto.</span></div>
+        <div class="stat"><span class="v" style="font-size:15px">Granola</span><span class="d">Minutos efectivos de reunión y compromisos.</span></div>
+        <div class="stat"><span class="v" style="font-size:15px">Tiempo en pantalla</span><span class="d">Uso por app y franja; fragmentación del día.</span></div>
+      </div>
+    </div>
+  </div>
+
+<div id="semana" hidden>
+    <div class="head" style="margin-top:18px"><h1 id="wkTitle">Tu semana</h1><div class="sub" id="wkSub"></div></div>
+    <div id="wkOut"></div>
+  </div>
+
+<div id="documentado" hidden>
+    <div class="head" style="margin-top:18px"><h1>Tu vida documentada</h1><div class="sub">Fotos · calendario · entrenamientos · LinkedIn, interpretados en tu dispositivo</div></div>
+    <div class="panel priv">
+      <div class="row" style="justify-content:space-between"><span class="eyebrow">Ambiente seguro</span><span class="tag" style="border-color:var(--mint);color:var(--mint)">Nada sale de tu equipo</span></div>
+      <ul>
+        <li>Los archivos se leen con tu navegador y se procesan aquí. No hay servidor, cuenta ni envío.</li>
+        <li>El reconocimiento de fotos corre en tu equipo (modelo CLIP descargado una sola vez, ~90 MB). La única conexión externa es esa descarga.</li>
+        <li>Por defecto nada se guarda: al cerrar la pestaña, desaparece. Si quieres conservar el resumen, se guarda solo el agregado por mes (categorías y horas), nunca fotos ni títulos de eventos.</li>
+        <li>En producción la política de seguridad del sitio (CSP) bloquea cualquier conexión que no sea la descarga del modelo.</li>
+      </ul>
+    </div>
+    <div class="panel" style="margin-top:12px">
+      <div class="row" style="justify-content:space-between"><h3>Fuentes</h3><span class="tag" id="docTag">Sin datos</span></div>
+      <div class="imports" style="margin-top:10px" id="docImports"></div>
+    </div>
+    <div id="docOut"></div>
+  </div>
+</div>
+
+</body></html>
